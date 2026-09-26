@@ -10,8 +10,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 # Import your custom module
 from external_mcp_servers import MultiMCPModuleManager
 
+import argparse
+
 load_dotenv(verbose=False)
-user_prompt = input("Ask your agent> ")
 
 @tool
 def get_time_now():
@@ -32,7 +33,7 @@ SERVER_CONFIGURATIONS = {
 
 local_tools = [get_time_now]
 
-async def run_agent():
+async def run_agent(chat_mode: bool = False):
     # 1. Instantiate the module manager
     mcp_module = MultiMCPModuleManager(SERVER_CONFIGURATIONS)
     
@@ -49,16 +50,46 @@ async def run_agent():
     agent = create_agent(model, all_tools)
 
     # 4. Invoke the agent
-    result = await agent.ainvoke(
-        {
-            "messages": [
+    if chat_mode:
+        print("\nStarting chat mode. Type 'exit' or 'quit' to stop.")
+        messages = []
+        while True:
+            try:
+                user_prompt = input("\nAsk your agent> ")
+                if user_prompt.lower() in ['exit', 'quit']:
+                    break
+                
+                messages.append({"role": "user", "content": user_prompt})
+                result = await agent.ainvoke({"messages": messages})
+                
+                # Update history with the result (assumes result['messages'] contains full history)
+                messages = result["messages"]
+                
+                # Get the last message output (checking for .text or .content safely)
+                last_msg = messages[-1]
+                reply_text = getattr(last_msg, "text", getattr(last_msg, "content", str(last_msg)))
+                print("\nAgent Output:", reply_text)
+                
+            except (KeyboardInterrupt, EOFError):
+                break
+    else:
+        user_prompt = input("Ask your agent> ")
+        result = await agent.ainvoke(
             {
-                "role": "user",
-                "content": user_prompt
-            }]
-        }
-    )
-    print("\nAgent Output:", result["messages"][-1].text)
+                "messages": [
+                {
+                    "role": "user",
+                    "content": user_prompt
+                }]
+            }
+        )
+        last_msg = result["messages"][-1]
+        reply_text = getattr(last_msg, "text", getattr(last_msg, "content", str(last_msg)))
+        print("\nAgent Output:", reply_text)
 
 if __name__ == "__main__":
-    asyncio.run(run_agent())
+    parser = argparse.ArgumentParser(description="Run the AI Agent.")
+    parser.add_argument("--chat", action="store_true", help="Run in continuous chat bot mode")
+    args = parser.parse_args()
+    
+    asyncio.run(run_agent(chat_mode=args.chat))
