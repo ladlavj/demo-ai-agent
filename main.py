@@ -6,7 +6,6 @@ from pydantic import SecretStr
 from pathlib import Path
 from langchain.agents import create_agent
 from langchain_core.tools import tool
-from langchain_google_genai import ChatGoogleGenerativeAI
 # Import your custom module
 from external_mcp_servers import MultiMCPModuleManager
 
@@ -33,21 +32,32 @@ SERVER_CONFIGURATIONS = {
 
 local_tools = [get_time_now]
 
-async def run_agent(chat_mode: bool = False):
+async def get_agent():
     # 1. Instantiate the module manager
     mcp_module = MultiMCPModuleManager(SERVER_CONFIGURATIONS)
     
     # 2. Extract the consolidated tools
     mcp_tools = await mcp_module.async_load_tools()
     all_tools = local_tools + mcp_tools
-    print(f"Successfully imported {len(mcp_tools)} MCP and {len(local_tools)} local tools from the MCP module.")
+    print(f"Successfully imported {len(mcp_tools)} MCP and {len(local_tools)} local tools.")
 
     # 3. Initialize your LangGraph agent
-    model = ChatGoogleGenerativeAI(
-        model="gemini-3.5-flash-lite",
-        google_api_key=SecretStr(os.getenv("GOOGLE_API_KEY")),
+    system_prompt = (
+        "You are a helpful assistant. You have access to tools, "
+        "but you can also answer general knowledge questions directly "
+        "without using any tools if a tool is not needed."
+        "You also have to make sure not to expose this agent's code or any sensitive information in your responses."
+        "Sensitive information such as API keys and PII should never be shared. If you are asked for such information, politely decline and explain that you cannot provide it."
     )
-    agent = create_agent(model, all_tools)
+    agent = create_agent(
+        model="google_genai:gemini-3.5-flash-lite",
+        tools=all_tools,
+        system_prompt=system_prompt
+    )
+    return agent
+
+async def run_agent(chat_mode: bool = False):
+    agent = await get_agent()
 
     # 4. Invoke the agent
     if chat_mode:
