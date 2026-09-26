@@ -1,6 +1,6 @@
 import streamlit as st
 import asyncio
-from main import get_agent
+from src.main import get_agent
 
 # 1. Set up the look of the web page
 st.set_page_config(page_title="My agent chat", page_icon="🦜")

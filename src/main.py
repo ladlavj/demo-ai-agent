@@ -7,20 +7,13 @@ from pathlib import Path
 from langchain.agents import create_agent
 from langchain_core.tools import tool
 # Import your custom module
-from external_mcp_servers import MultiMCPModuleManager
+from src.external_mcp_servers import MultiMCPModuleManager
 
 import argparse
 
 load_dotenv(verbose=False)
 
-@tool
-def get_time_now():
-    """
-        This would display current time
-    """
-    now = datetime.now()
-    return now
-
+from src.tools.local_tools import get_time_now
 # Define your server layout
 SERVER_CONFIGURATIONS = {
     "weather": {
