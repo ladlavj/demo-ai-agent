@@ -1,0 +1,3 @@
+[submodule "mcp_servers/Weather-MCP-ClaudeDesktop"]
+	path = mcp_servers/Weather-MCP-ClaudeDesktop
+	url = https://github.com/SaintDoresh/Weather-MCP-ClaudeDesktop.git
