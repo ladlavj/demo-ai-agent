@@ -31,7 +31,7 @@ local_tools = [get_time_now]
 async def get_agent():
     # 1. Instantiate the module manager
     mcp_module = MultiMCPModuleManager(SERVER_CONFIGURATIONS)
-    
+
     # 2. Extract the consolidated tools
     mcp_tools = await mcp_module.async_load_tools()
     all_tools = local_tools + mcp_tools
@@ -64,18 +64,18 @@ async def run_agent(chat_mode: bool = False):
                 user_prompt = input("\nAsk your agent> ")
                 if user_prompt.lower() in ['exit', 'quit']:
                     break
-                
+
                 messages.append({"role": "user", "content": user_prompt})
                 result = await agent.ainvoke({"messages": messages})
-                
+
                 # Update history with the result (assumes result['messages'] contains full history)
                 messages = result["messages"]
-                
+
                 # Get the last message output (checking for .text or .content safely)
                 last_msg = messages[-1]
                 reply_text = getattr(last_msg, "text", getattr(last_msg, "content", str(last_msg)))
                 print("\nAgent Output:", reply_text)
-                
+
             except (KeyboardInterrupt, EOFError):
                 break
     else:
@@ -97,5 +97,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the AI Agent.")
     parser.add_argument("--chat", action="store_true", help="Run in continuous chat bot mode")
     args = parser.parse_args()
-    
+
     asyncio.run(run_agent(chat_mode=args.chat))
