@@ -9,7 +9,10 @@ from src.main import get_agent
 
 load_dotenv()
 
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    token_verification_enabled=False
+)
 
 # --- Helper: Sync wrapper for your Async Agent ---
 # We cache the agent so it only loads the tools once
