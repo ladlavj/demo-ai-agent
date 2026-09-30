@@ -6,13 +6,13 @@ from langchain_core.tools import BaseTool
 
 class MultiMCPModuleManager:
     """
-    A Python module wrapper for managing multiple MCP servers 
+    A Python module wrapper for managing multiple MCP servers
     and exposing their aggregated tools to LangChain agents.
     """
     def __init__(self, server_configs: Dict[str, Dict[str, Any]]):
         """
         Initializes the client with a dictionary of server configs.
-        
+
         Example config:
         {
             "weather": {"transport": "http", "url": "http://localhost:8000/mcp"},
@@ -38,5 +38,5 @@ class MultiMCPModuleManager:
         if loop and loop.is_running():
             # If an async loop is already running, you should await async_load_tools instead
             raise RuntimeError("Async loop running. Use 'await async_load_tools()' instead.")
-        
+
         return asyncio.run(self.async_load_tools())
