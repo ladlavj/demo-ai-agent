@@ -72,6 +72,12 @@ python -m src.main
 
 You can run the entire application inside an isolated Docker container. The container uses an intelligent entrypoint script that can run all interfaces simultaneously, or let you pick exactly which one you want using the `RUN_MODE` environment variable.
 
+Make sure your `.env` file contains the following 4 required variables before running Docker:
+1. `GOOGLE_API_KEY` (Required for the AI model)
+2. `OPENWEATHER_API_KEY` (Required for the Weather MCP Server)
+3. `SLACK_APP_TOKEN` (Required if running the Slack Bot)
+4. `SLACK_BOT_TOKEN` (Required if running the Slack Bot)
+
 1. **Build the image:**
    ```bash
    docker build -t demo-ai-agent .
