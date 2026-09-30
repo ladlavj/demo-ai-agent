@@ -20,12 +20,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of your application code into the container
 COPY . .
 
+# Set path to avoid issues with Streamlit finding the correct working directory
+ENV PYTHONPATH="${PYTHONPATH}:/app"
+
 # Expose Streamlit's default port
 EXPOSE 8501
 
-# Healthcheck to verify Streamlit is running
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
+# Make the entrypoint script executable
+RUN chmod +x entrypoint.sh
 
-# By default, start the Streamlit Web UI. 
-# (You can override this by passing 'python -m src.main' to the docker run command)
-CMD ["streamlit", "run", "src/chat_ui.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Use the entrypoint script to dynamically start the chosen interface(s)
+ENTRYPOINT ["./entrypoint.sh"]

@@ -7,13 +7,13 @@ from pathlib import Path
 from langchain.agents import create_agent
 from langchain_core.tools import tool
 # Import your custom module
-from external_mcp_servers import MultiMCPModuleManager
+from src.external_mcp_servers import MultiMCPModuleManager
 import argparse
 
 load_dotenv(verbose=False)
 openweather_api_key = os.getenv("OPENWEATHER_API_KEY", "")
 
-from tools.local_tools import get_time_now
+from src.tools.local_tools import get_time_now
 # Define your server layout
 SERVER_CONFIGURATIONS = {
     "weather": {
